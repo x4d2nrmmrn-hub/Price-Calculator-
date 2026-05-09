@@ -1,0 +1,1194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Price Builder">
+<meta name="theme-color" content="#0d0d14">
+<title>Price Builder — Happy Outlet</title>
+<link rel="manifest" href="./manifest.json">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@600;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:        #0d0d14;
+    --surface:   #16161f;
+    --surface2:  #1e1e2a;
+    --border:    #2a2a3a;
+    --accent:    #f5a623;
+    --accent2:   #e8931a;
+    --green:     #2ecc71;
+    --red:       #e74c3c;
+    --text:      #f0f0f5;
+    --muted:     #6b6b80;
+    --sub:       #3a3a50;
+    --mono:      'DM Mono', monospace;
+    --sans:      'DM Sans', sans-serif;
+    --display:   'Syne', sans-serif;
+    --radius:    14px;
+    --safe-top:  env(safe-area-inset-top, 0px);
+    --safe-bot:  env(safe-area-inset-bottom, 0px);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  html { background: var(--bg); }
+
+  body {
+    font-family: var(--sans);
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    min-height: 100dvh;
+    padding-bottom: calc(32px + var(--safe-bot));
+    overflow-x: hidden;
+  }
+
+  /* ── Top bar ── */
+  .topbar {
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    padding: calc(16px + var(--safe-top)) 20px 14px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+
+  .topbar-left .eyebrow {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 3px;
+  }
+
+  .topbar-left .title {
+    font-family: var(--display);
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--text);
+    letter-spacing: -0.02em;
+    line-height: 1;
+  }
+
+  .icon-btn {
+    width: 42px; height: 42px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    position: relative;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .icon-btn:active { background: var(--surface2); border-color: var(--accent); }
+  .icon-btn svg { width: 18px; height: 18px; }
+
+  .badge {
+    position: absolute; top: -3px; right: -3px;
+    background: var(--accent); color: #000;
+    font-family: var(--mono);
+    font-size: 9px; font-weight: 500;
+    min-width: 17px; height: 17px;
+    border-radius: 9px;
+    display: flex; align-items: center; justify-content: center;
+    padding: 0 4px;
+    border: 2px solid var(--bg);
+  }
+
+  /* ── Main layout ── */
+  .main { padding: 16px 16px 0; max-width: 540px; margin: 0 auto; }
+
+  /* ── Cards ── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    margin-bottom: 10px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(245,166,35,0.3), transparent);
+  }
+
+  .card-title {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    margin-bottom: 14px;
+  }
+
+  /* ── Input rows ── */
+  .input-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+  }
+  .input-row:last-child { margin-bottom: 0; }
+
+  .input-label {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text);
+    flex: 1;
+    min-width: 0;
+  }
+  .input-label small {
+    display: block;
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 2px;
+    font-weight: 400;
+  }
+
+  .input-wrap {
+    display: flex;
+    align-items: center;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0 10px;
+    height: 40px;
+    width: 128px;
+    flex-shrink: 0;
+    transition: border-color 0.15s;
+  }
+  .input-wrap:focus-within { border-color: var(--accent); }
+  .input-wrap .sym {
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--muted);
+    margin-right: 5px;
+    flex-shrink: 0;
+  }
+  .input-wrap input {
+    border: none;
+    background: transparent;
+    font-family: var(--mono);
+    font-size: 14px;
+    color: var(--text);
+    width: 100%;
+    outline: none;
+    text-align: right;
+  }
+  .input-wrap input::placeholder { color: var(--sub); }
+
+  /* Two-part labour row on mobile */
+  .labour-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 0;
+  }
+  .labour-field { display: flex; flex-direction: column; gap: 6px; }
+  .labour-field label {
+    font-size: 11px;
+    color: var(--muted);
+    font-family: var(--mono);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .labour-field .input-wrap { width: 100%; }
+  .labour-total {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .labour-total span:first-child { font-size: 12px; color: var(--muted); font-family: var(--mono); }
+  .labour-total span:last-child { font-family: var(--mono); font-size: 15px; color: var(--accent); font-weight: 500; }
+
+  .full-input {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0 12px;
+    height: 40px;
+    font-size: 14px;
+    color: var(--text);
+    font-family: var(--sans);
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .full-input:focus { border-color: var(--accent); }
+  .full-input::placeholder { color: var(--sub); }
+
+  textarea.full-input {
+    height: auto;
+    min-height: 72px;
+    padding: 10px 12px;
+    resize: vertical;
+    line-height: 1.5;
+  }
+
+  /* ── Margin slider ── */
+  .margin-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 12px; }
+  .margin-header .lbl { font-size: 14px; font-weight: 500; color: var(--text); }
+  .margin-value {
+    font-family: var(--display);
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--accent);
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+
+  .slider-track { position: relative; height: 4px; border-radius: 2px; background: var(--sub); margin-bottom: 0; }
+  .slider-fill { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 2px; background: linear-gradient(90deg, var(--accent2), var(--accent)); pointer-events: none; }
+  .slider-track input[type=range] {
+    position: absolute; top: -12px; left: 0; width: 100%;
+    background: transparent; margin: 0; height: 28px;
+    -webkit-appearance: none; outline: none; cursor: pointer;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    background: var(--accent);
+    cursor: pointer;
+    box-shadow: 0 0 0 3px rgba(245,166,35,0.25), 0 2px 8px rgba(0,0,0,0.4);
+  }
+
+  .presets { display: flex; gap: 6px; margin-top: 12px; flex-wrap: wrap; }
+  .preset {
+    font-family: var(--mono);
+    font-size: 12px;
+    padding: 5px 11px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .preset:active { transform: scale(0.95); }
+  .preset.on { background: var(--accent); border-color: var(--accent); color: #000; font-weight: 500; }
+
+  /* ── Results grid ── */
+  .results-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+
+  .tile {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 13px 14px;
+    position: relative;
+    overflow: hidden;
+  }
+  .tile-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 5px;
+  }
+  .tile-value {
+    font-family: var(--display);
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -0.02em;
+    line-height: 1;
+  }
+
+  .tile.sell {
+    background: linear-gradient(135deg, #1a1500, #2a1f00);
+    border-color: var(--accent2);
+  }
+  .tile.sell::after {
+    content: '';
+    position: absolute;
+    top: 0; right: 0;
+    width: 60px; height: 60px;
+    background: radial-gradient(circle, rgba(245,166,35,0.15), transparent 70%);
+  }
+  .tile.sell .tile-label { color: rgba(245,166,35,0.6); }
+  .tile.sell .tile-value { color: var(--accent); }
+
+  .tile.profit-pos { background: rgba(46,204,113,0.08); border-color: rgba(46,204,113,0.2); }
+  .tile.profit-pos .tile-value { color: var(--green); }
+  .tile.profit-pos .tile-label { color: rgba(46,204,113,0.5); }
+
+  .tile.profit-neg { background: rgba(231,76,60,0.08); border-color: rgba(231,76,60,0.2); }
+  .tile.profit-neg .tile-value { color: var(--red); }
+  .tile.profit-neg .tile-label { color: rgba(231,76,60,0.5); }
+
+  /* ── Breakdown ── */
+  .breakdown-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 7px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+  }
+  .breakdown-row:last-child { border-bottom: none; }
+  .breakdown-row .bl { color: var(--muted); font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; }
+  .breakdown-row .bv { font-family: var(--mono); font-size: 13px; color: var(--text); }
+  .breakdown-row.total-row { padding-top: 10px; margin-top: 2px; }
+  .breakdown-row.total-row .bl { color: var(--text); font-size: 12px; }
+  .breakdown-row.total-row .bv { color: var(--text); font-size: 14px; }
+  .breakdown-row.sell-row .bl { color: var(--accent); font-size: 12px; }
+  .breakdown-row.sell-row .bv { color: var(--accent); font-size: 15px; font-weight: 500; }
+
+  .divider { height: 1px; background: var(--border); margin: 12px 0; }
+
+  /* ── Action buttons ── */
+  .action-row { display: flex; gap: 8px; margin-top: 4px; }
+
+  .btn-save {
+    flex: 1;
+    height: 50px;
+    border-radius: 12px;
+    border: none;
+    background: linear-gradient(135deg, var(--accent2), var(--accent));
+    color: #000;
+    font-family: var(--display);
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    letter-spacing: -0.01em;
+    transition: opacity 0.15s, transform 0.1s;
+    box-shadow: 0 4px 20px rgba(245,166,35,0.25);
+  }
+  .btn-save:active { opacity: 0.85; transform: scale(0.98); }
+
+  .btn-reset {
+    width: 50px; height: 50px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--muted);
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: border-color 0.15s, background 0.15s;
+    flex-shrink: 0;
+  }
+  .btn-reset:active { background: var(--surface2); border-color: var(--muted); }
+  .btn-reset svg { width: 17px; height: 17px; }
+
+  /* ── Save Modal ── */
+  .modal-bg {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 80;
+    align-items: flex-end;
+    justify-content: center;
+    padding: 0;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+  }
+  .modal-bg.open { display: flex; }
+
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 22px 22px 0 0;
+    padding: 8px 22px calc(24px + var(--safe-bot)) 22px;
+    width: 100%;
+    max-width: 540px;
+    animation: slideUp 0.25s cubic-bezier(0.34,1.4,0.64,1);
+  }
+  @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+
+  .modal-handle {
+    width: 36px; height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    margin: 10px auto 20px;
+  }
+
+  .modal h3 {
+    font-family: var(--display);
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--text);
+    margin-bottom: 4px;
+    letter-spacing: -0.02em;
+  }
+  .modal .modal-sub {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 18px;
+    line-height: 1.5;
+  }
+
+  .modal-summary {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin-bottom: 16px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px 16px;
+  }
+  .ms-item .ms-label { font-family: var(--mono); font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 2px; }
+  .ms-item .ms-val { font-family: var(--mono); font-size: 14px; color: var(--text); }
+  .ms-item.accent .ms-val { color: var(--accent); font-weight: 500; }
+
+  .modal-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    margin-bottom: 7px;
+  }
+
+  .modal-input {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 0 14px;
+    height: 46px;
+    font-size: 15px;
+    color: var(--text);
+    font-family: var(--sans);
+    outline: none;
+    margin-bottom: 12px;
+    transition: border-color 0.15s;
+  }
+  .modal-input:focus { border-color: var(--accent); }
+  .modal-input::placeholder { color: var(--sub); }
+
+  textarea.modal-input {
+    height: auto;
+    min-height: 80px;
+    padding: 12px 14px;
+    resize: none;
+    line-height: 1.5;
+  }
+
+  .modal-btns { display: flex; gap: 10px; margin-top: 4px; }
+  .modal-cancel {
+    flex: 1; height: 48px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: var(--sans);
+  }
+  .modal-cancel:active { background: var(--surface2); }
+  .modal-confirm {
+    flex: 2; height: 48px;
+    border-radius: 12px;
+    border: none;
+    background: linear-gradient(135deg, var(--accent2), var(--accent));
+    color: #000;
+    font-family: var(--display);
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    letter-spacing: -0.01em;
+    transition: opacity 0.15s;
+  }
+  .modal-confirm:active { opacity: 0.85; }
+
+  /* ── Drawer ── */
+  .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 50; backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px); }
+  .overlay.open { display: block; }
+
+  .drawer {
+    position: fixed; top: 0; right: -100%;
+    width: min(400px, 96vw); height: 100%;
+    background: var(--surface);
+    border-left: 1px solid var(--border);
+    z-index: 60;
+    transition: right 0.3s cubic-bezier(0.4,0,0.2,1);
+    display: flex; flex-direction: column;
+  }
+  .drawer.open { right: 0; }
+
+  .drawer-head {
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    padding: calc(18px + var(--safe-top)) 18px 14px;
+  }
+  .drawer-head-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+  .drawer-head h2 {
+    font-family: var(--display);
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--text);
+    letter-spacing: -0.02em;
+  }
+  .close-btn {
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--muted);
+    font-size: 14px;
+    font-family: var(--sans);
+    transition: border-color 0.15s;
+  }
+  .close-btn:active { border-color: var(--muted); }
+
+  .search-wrap {
+    display: flex; align-items: center;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 0 12px; height: 40px; gap: 8px;
+    transition: border-color 0.15s;
+  }
+  .search-wrap:focus-within { border-color: var(--accent); }
+  .search-wrap svg { width: 14px; height: 14px; flex-shrink: 0; }
+  .search-input {
+    border: none; background: transparent;
+    font-size: 14px; color: var(--text); width: 100%;
+    outline: none; font-family: var(--sans);
+  }
+  .search-input::placeholder { color: var(--sub); }
+  .search-clear {
+    background: var(--sub); border: none; border-radius: 50%;
+    width: 18px; height: 18px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; color: var(--text); flex-shrink: 0;
+    font-family: var(--sans); padding: 0;
+  }
+
+  .drawer-body { flex: 1; overflow-y: auto; padding: 14px; }
+  .drawer-body::-webkit-scrollbar { width: 4px; }
+  .drawer-body::-webkit-scrollbar-track { background: transparent; }
+  .drawer-body::-webkit-scrollbar-thumb { background: var(--sub); border-radius: 2px; }
+
+  .empty-state {
+    text-align: center;
+    padding: 60px 24px;
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.8;
+  }
+  .empty-icon { font-size: 40px; margin-bottom: 14px; opacity: 0.6; }
+
+  .no-results { text-align: center; padding: 40px 20px; color: var(--sub); font-size: 14px; }
+
+  /* Quote cards */
+  .qcard {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-bottom: 10px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.15s;
+  }
+  .qcard::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; bottom: 0;
+    width: 3px;
+    background: var(--accent);
+    border-radius: 3px 0 0 3px;
+    opacity: 0.6;
+  }
+  .qcard-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px; }
+  .qcard-name {
+    font-family: var(--display);
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text);
+    flex: 1;
+    margin-right: 10px;
+    word-break: break-word;
+    letter-spacing: -0.01em;
+  }
+  .qcard-price {
+    font-family: var(--mono);
+    font-size: 15px;
+    color: var(--accent);
+    white-space: nowrap;
+    font-weight: 500;
+  }
+  .qcard-meta {
+    font-size: 11px;
+    color: var(--muted);
+    display: flex; gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 8px;
+    font-family: var(--mono);
+  }
+  .qcard-notes {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.5;
+    margin-bottom: 10px;
+    padding: 8px 10px;
+    background: var(--bg);
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  .qcard-btns { display: flex; gap: 6px; }
+  .qbtn {
+    flex: 1; padding: 8px 6px;
+    border-radius: 8px; border: none;
+    font-size: 12px; font-weight: 600;
+    cursor: pointer; font-family: var(--sans);
+    transition: opacity 0.12s;
+    letter-spacing: 0.01em;
+  }
+  .qbtn:active { opacity: 0.75; }
+  .qbtn.load { background: rgba(245,166,35,0.15); color: var(--accent); border: 1px solid rgba(245,166,35,0.25); }
+  .qbtn.del { background: rgba(231,76,60,0.1); color: var(--red); border: 1px solid rgba(231,76,60,0.2); }
+
+  mark { background: rgba(245,166,35,0.3); color: var(--text); border-radius: 2px; padding: 0 1px; }
+
+  .drawer-foot {
+    padding: calc(12px) 16px calc(12px + var(--safe-bot));
+    border-top: 1px solid var(--border);
+    background: var(--bg);
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--sub);
+    text-align: center;
+    line-height: 1.6;
+  }
+  .drawer-foot .pipeline { color: var(--accent); font-size: 13px; font-weight: 500; }
+
+  /* ── Toast ── */
+  .toast {
+    position: fixed;
+    bottom: calc(30px + var(--safe-bot));
+    left: 50%;
+    transform: translateX(-50%) translateY(16px);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 13px;
+    padding: 10px 20px;
+    border-radius: 20px;
+    opacity: 0;
+    transition: all 0.22s;
+    z-index: 200;
+    white-space: nowrap;
+    pointer-events: none;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* ── Install banner ── */
+  .install-banner {
+    margin: 0 16px 10px;
+    background: linear-gradient(135deg, #1a1500, #261b00);
+    border: 1px solid rgba(245,166,35,0.3);
+    border-radius: var(--radius);
+    padding: 12px 16px;
+    display: none;
+    align-items: center;
+    gap: 12px;
+  }
+  .install-banner.show { display: flex; }
+  .install-banner p { font-size: 13px; color: var(--text); flex: 1; line-height: 1.4; }
+  .install-banner p span { color: var(--accent); font-weight: 600; }
+  .install-btn {
+    background: var(--accent);
+    color: #000;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: var(--sans);
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .install-dismiss {
+    background: none; border: none;
+    color: var(--muted); font-size: 18px;
+    cursor: pointer; padding: 0 2px;
+    flex-shrink: 0;
+  }
+</style>
+</head>
+<body>
+
+<!-- Top bar -->
+<div class="topbar">
+  <div class="topbar-left">
+    <div class="eyebrow">Happy Outlet</div>
+    <div class="title">Price Builder</div>
+  </div>
+  <button class="icon-btn" onclick="openDrawer()" title="Saved quotes">
+    <span class="badge" id="quoteBadge" style="display:none">0</span>
+    <svg viewBox="0 0 24 24" fill="none" stroke="#f0f0f5" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+      <polyline points="14 2 14 8 20 8"/>
+      <line x1="8" y1="13" x2="16" y2="13"/>
+      <line x1="8" y1="17" x2="16" y2="17"/>
+      <polyline points="10 9 9 9 8 9"/>
+    </svg>
+  </button>
+</div>
+
+<!-- Install banner (shows when installable) -->
+<div class="install-banner" id="installBanner">
+  <p>Add <span>Price Builder</span> to your home screen for quick access.</p>
+  <button class="install-btn" id="installBtn" onclick="triggerInstall()">Install</button>
+  <button class="install-dismiss" onclick="dismissInstall()">&#x2715;</button>
+</div>
+
+<!-- Main -->
+<div class="main">
+
+  <!-- Labour -->
+  <div class="card">
+    <div class="card-title">Labour</div>
+    <div class="labour-grid">
+      <div class="labour-field">
+        <label>Hourly rate</label>
+        <div class="input-wrap"><span class="sym">$</span><input type="number" id="rate" value="85" min="0" step="1" inputmode="decimal"></div>
+      </div>
+      <div class="labour-field">
+        <label>Hours</label>
+        <div class="input-wrap"><input type="number" id="hours" value="0" min="0" step="0.5" inputmode="decimal" style="text-align:right;"><span class="sym" style="margin-left:4px;margin-right:0;">h</span></div>
+      </div>
+    </div>
+    <div class="labour-total">
+      <span>Labour total</span>
+      <span id="labourTotal">$0</span>
+    </div>
+  </div>
+
+  <!-- Materials -->
+  <div class="card">
+    <div class="card-title">Materials &amp; Parts</div>
+    <div class="input-row">
+      <div class="input-label">Cost</div>
+      <div class="input-wrap"><span class="sym">$</span><input type="number" id="materials" value="0" min="0" step="1" inputmode="decimal"></div>
+    </div>
+  </div>
+
+  <!-- Subcontractors -->
+  <div class="card">
+    <div class="card-title">Subcontractors</div>
+    <div class="input-row">
+      <div class="input-label">Cost</div>
+      <div class="input-wrap"><span class="sym">$</span><input type="number" id="subcontractor" value="0" min="0" step="1" inputmode="decimal"></div>
+    </div>
+  </div>
+
+  <!-- Equipment -->
+  <div class="card">
+    <div class="card-title">Equipment &amp; Tools</div>
+    <div class="input-row">
+      <div class="input-label">Cost</div>
+      <div class="input-wrap"><span class="sym">$</span><input type="number" id="equipment" value="0" min="0" step="1" inputmode="decimal"></div>
+    </div>
+  </div>
+
+  <!-- Margin -->
+  <div class="card">
+    <div class="card-title">Target gross margin</div>
+    <div class="margin-header">
+      <span class="lbl">Margin</span>
+      <span class="margin-value" id="marginDisplay">67%</span>
+    </div>
+    <div class="slider-track">
+      <div class="slider-fill" id="sliderFill" style="width:75.6%"></div>
+      <input type="range" id="marginSlider" min="10" max="85" step="1" value="67">
+    </div>
+    <div class="presets">
+      <button class="preset" onclick="setMargin(50)">50%</button>
+      <button class="preset on" onclick="setMargin(67)">67%</button>
+      <button class="preset" onclick="setMargin(70)">70%</button>
+      <button class="preset" onclick="setMargin(75)">75%</button>
+      <button class="preset" onclick="setMargin(80)">80%</button>
+    </div>
+  </div>
+
+  <!-- Results -->
+  <div class="card">
+    <div class="card-title">Results</div>
+    <div class="results-grid">
+      <div class="tile sell">
+        <div class="tile-label">Selling price</div>
+        <div class="tile-value" id="sellingPrice">$0</div>
+      </div>
+      <div class="tile profit-pos" id="profitTile">
+        <div class="tile-label">Gross profit</div>
+        <div class="tile-value" id="grossProfit">$0</div>
+      </div>
+      <div class="tile">
+        <div class="tile-label">Total cost</div>
+        <div class="tile-value" id="totalCost">$0</div>
+      </div>
+      <div class="tile">
+        <div class="tile-label">Actual margin</div>
+        <div class="tile-value" id="actualMargin">—</div>
+      </div>
+    </div>
+    <div class="divider"></div>
+    <div class="card-title" style="margin-bottom:10px;">Cost breakdown</div>
+    <div class="breakdown-row"><span class="bl">Labour</span><span class="bv" id="bLabour">$0</span></div>
+    <div class="breakdown-row"><span class="bl">Materials</span><span class="bv" id="bMaterials">$0</span></div>
+    <div class="breakdown-row"><span class="bl">Subcontractors</span><span class="bv" id="bSub">$0</span></div>
+    <div class="breakdown-row"><span class="bl">Equipment</span><span class="bv" id="bEquip">$0</span></div>
+    <div class="divider"></div>
+    <div class="breakdown-row total-row"><span class="bl">Total cost</span><span class="bv" id="bTotal">$0</span></div>
+    <div class="breakdown-row sell-row"><span class="bl">Selling price CAD</span><span class="bv" id="bSell">$0</span></div>
+  </div>
+
+  <div class="action-row">
+    <button class="btn-save" onclick="openSaveModal()">Save Quote</button>
+    <button class="btn-reset" onclick="resetAll()" title="Reset fields">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.5"/>
+      </svg>
+    </button>
+  </div>
+
+</div><!-- /main -->
+
+<!-- Save Modal -->
+<div class="modal-bg" id="saveModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <h3>Save Quote</h3>
+    <p class="modal-sub">Name this quote so you can find it later.</p>
+    <div class="modal-summary" id="modalSummary"></div>
+    <div class="modal-label">Quote name</div>
+    <input type="text" class="modal-input" id="modalName" placeholder="e.g. Panel upgrade — 123 Main St" maxlength="80">
+    <div class="modal-label">Notes (optional)</div>
+    <textarea class="modal-input" id="modalNotes" placeholder="Client details, scope of work, special conditions..."></textarea>
+    <div class="modal-btns">
+      <button class="modal-cancel" onclick="closeSaveModal()">Cancel</button>
+      <button class="modal-confirm" onclick="confirmSave()">Save Quote</button>
+    </div>
+  </div>
+</div>
+
+<!-- Drawer overlay -->
+<div class="overlay" id="overlay" onclick="closeDrawer()"></div>
+
+<!-- Drawer -->
+<div class="drawer" id="drawer">
+  <div class="drawer-head">
+    <div class="drawer-head-top">
+      <h2>Saved Quotes</h2>
+      <button class="close-btn" onclick="closeDrawer()">&#x2715;</button>
+    </div>
+    <div class="search-wrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#6b6b80" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+      </svg>
+      <input type="text" class="search-input" id="searchInput" placeholder="Search quotes..." oninput="renderDrawer()">
+      <button class="search-clear" id="searchClear" onclick="clearSearch()" style="display:none">&#x2715;</button>
+    </div>
+  </div>
+  <div class="drawer-body" id="drawerBody"></div>
+  <div class="drawer-foot" id="drawerFoot"></div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+  const KEY      = 'happyoutlet_v3';
+  const RATE_KEY = 'happyoutlet_rate';
+
+  /* ── Storage ── */
+  function loadQuotes() { try { return JSON.parse(localStorage.getItem(KEY)) || []; } catch(e) { return []; } }
+  function saveQuotes(arr) { localStorage.setItem(KEY, JSON.stringify(arr)); updateBadge(); }
+  function savedRate() { return parseFloat(localStorage.getItem(RATE_KEY)) || 85; }
+  function persistRate(v) { localStorage.setItem(RATE_KEY, v); }
+
+  function updateBadge() {
+    const n = loadQuotes().length;
+    const b = document.getElementById('quoteBadge');
+    b.style.display = n > 0 ? 'flex' : 'none';
+    b.textContent = n;
+  }
+
+  /* ── Format ── */
+  function fmt(n) { return '$' + Math.round(n).toLocaleString('en-CA'); }
+
+  /* ── Calc ── */
+  function getVals() {
+    const rate  = parseFloat(document.getElementById('rate').value)         || 0;
+    const hours = parseFloat(document.getElementById('hours').value)        || 0;
+    const mat   = parseFloat(document.getElementById('materials').value)    || 0;
+    const sub   = parseFloat(document.getElementById('subcontractor').value)|| 0;
+    const equip = parseFloat(document.getElementById('equipment').value)    || 0;
+    const margin= parseInt(document.getElementById('marginSlider').value);
+    const labour = rate * hours;
+    const total  = labour + mat + sub + equip;
+    const sell   = margin < 100 ? total / (1 - margin / 100) : 0;
+    const profit = sell - total;
+    const actual = sell > 0 ? (profit / sell * 100) : 0;
+    return { rate, hours, mat, sub, equip, margin, labour, total, sell, profit, actual };
+  }
+
+  function calc() {
+    const v = getVals();
+    persistRate(v.rate);
+
+    document.getElementById('marginDisplay').textContent = v.margin + '%';
+    document.getElementById('sliderFill').style.width = ((v.margin - 10) / 75 * 100) + '%';
+    document.querySelectorAll('.preset').forEach(b => b.classList.toggle('on', parseInt(b.textContent) === v.margin));
+
+    document.getElementById('labourTotal').textContent  = fmt(v.labour);
+    document.getElementById('sellingPrice').textContent = fmt(v.sell);
+    document.getElementById('grossProfit').textContent  = fmt(v.profit);
+    document.getElementById('totalCost').textContent    = fmt(v.total);
+    document.getElementById('actualMargin').textContent = v.total > 0 ? v.actual.toFixed(1) + '%' : '—';
+    document.getElementById('bLabour').textContent    = fmt(v.labour);
+    document.getElementById('bMaterials').textContent = fmt(v.mat);
+    document.getElementById('bSub').textContent       = fmt(v.sub);
+    document.getElementById('bEquip').textContent     = fmt(v.equip);
+    document.getElementById('bTotal').textContent     = fmt(v.total);
+    document.getElementById('bSell').textContent      = fmt(v.sell);
+
+    const pt = document.getElementById('profitTile');
+    pt.className = 'tile ' + (v.profit < 0 ? 'profit-neg' : 'profit-pos');
+  }
+
+  function setMargin(n) {
+    document.getElementById('marginSlider').value = n;
+    calc();
+  }
+
+  /* ── Save modal ── */
+  function openSaveModal() {
+    const v = getVals();
+    if (v.total === 0) { showToast('Add some costs first'); return; }
+    document.getElementById('modalName').value  = '';
+    document.getElementById('modalNotes').value = '';
+    document.getElementById('modalSummary').innerHTML = `
+      <div class="ms-item accent"><div class="ms-label">Selling price</div><div class="ms-val">${fmt(v.sell)}</div></div>
+      <div class="ms-item"><div class="ms-label">Gross profit</div><div class="ms-val">${fmt(v.profit)}</div></div>
+      <div class="ms-item"><div class="ms-label">Total cost</div><div class="ms-val">${fmt(v.total)}</div></div>
+      <div class="ms-item"><div class="ms-label">Margin</div><div class="ms-val">${v.margin}%</div></div>
+    `;
+    document.getElementById('saveModal').classList.add('open');
+    setTimeout(() => document.getElementById('modalName').focus(), 150);
+  }
+
+  function closeSaveModal() { document.getElementById('saveModal').classList.remove('open'); }
+
+  function confirmSave() {
+    const name  = document.getElementById('modalName').value.trim()  || 'Untitled quote';
+    const notes = document.getElementById('modalNotes').value.trim();
+    const v = getVals();
+    const date = new Date().toLocaleDateString('en-CA', { month: 'short', day: 'numeric', year: 'numeric' });
+    const quotes = loadQuotes();
+    quotes.unshift({ id: Date.now(), name, notes, date, ...v });
+    saveQuotes(quotes);
+    closeSaveModal();
+    showToast('Quote saved');
+    if (document.getElementById('drawer').classList.contains('open')) renderDrawer();
+  }
+
+  /* ── Reset ── */
+  function resetAll() {
+    document.getElementById('rate').value         = savedRate();
+    document.getElementById('hours').value        = 0;
+    document.getElementById('materials').value    = 0;
+    document.getElementById('subcontractor').value= 0;
+    document.getElementById('equipment').value    = 0;
+    document.getElementById('marginSlider').value = 67;
+    calc();
+    showToast('Fields reset');
+  }
+
+  /* ── Drawer / search ── */
+  function clearSearch() {
+    document.getElementById('searchInput').value = '';
+    document.getElementById('searchClear').style.display = 'none';
+    renderDrawer();
+  }
+
+  function esc(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  function highlight(text, q) {
+    if (!q) return esc(text);
+    const re = new RegExp('(' + q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&') + ')', 'gi');
+    return esc(text).replace(re, '<mark>$1</mark>');
+  }
+
+  function renderDrawer() {
+    const all   = loadQuotes();
+    const query = document.getElementById('searchInput').value.trim().toLowerCase();
+    document.getElementById('searchClear').style.display = query ? 'flex' : 'none';
+
+    const list = query
+      ? all.filter(q =>
+          q.name.toLowerCase().includes(query) ||
+          (q.notes || '').toLowerCase().includes(query) ||
+          q.date.toLowerCase().includes(query) ||
+          fmt(q.sell).includes(query)
+        )
+      : all;
+
+    const body = document.getElementById('drawerBody');
+    const foot = document.getElementById('drawerFoot');
+
+    if (all.length === 0) {
+      body.innerHTML = `<div class="empty-state"><div class="empty-icon">⚡</div>No saved quotes yet.<br>Build a quote and tap <strong style="color:var(--accent)">Save Quote</strong>.</div>`;
+      foot.innerHTML = '';
+      return;
+    }
+
+    if (list.length === 0) {
+      body.innerHTML = `<div class="no-results">No quotes match &ldquo;${esc(query)}&rdquo;</div>`;
+    } else {
+      body.innerHTML = list.map(q => `
+        <div class="qcard">
+          <div class="qcard-top">
+            <div class="qcard-name">${highlight(q.name, query)}</div>
+            <div class="qcard-price">${fmt(q.sell)}</div>
+          </div>
+          <div class="qcard-meta">
+            <span>${highlight(q.date, query)}</span>
+            <span>Cost ${fmt(q.total)}</span>
+            <span>${q.margin}% margin</span>
+            <span>Profit ${fmt(q.profit)}</span>
+          </div>
+          ${q.notes ? `<div class="qcard-notes">${highlight(q.notes, query)}</div>` : ''}
+          <div class="qcard-btns">
+            <button class="qbtn load" onclick="loadQuote(${q.id})">Load into calculator</button>
+            <button class="qbtn del"  onclick="deleteQuote(${q.id})">Delete</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    const pipeline = all.reduce((s, q) => s + q.sell, 0);
+    foot.innerHTML =
+      `<div>${query ? list.length + ' of ' + all.length : all.length} quote${all.length !== 1 ? 's' : ''}</div>` +
+      `<div class="pipeline">Pipeline ${fmt(pipeline)} CAD</div>`;
+  }
+
+  function loadQuote(id) {
+    const q = loadQuotes().find(x => x.id === id);
+    if (!q) return;
+    document.getElementById('rate').value          = q.rate;
+    document.getElementById('hours').value         = q.hours;
+    document.getElementById('materials').value     = q.mat;
+    document.getElementById('subcontractor').value = q.sub;
+    document.getElementById('equipment').value     = q.equip;
+    document.getElementById('marginSlider').value  = q.margin;
+    calc();
+    closeDrawer();
+    showToast('Loaded: ' + q.name);
+  }
+
+  function deleteQuote(id) {
+    saveQuotes(loadQuotes().filter(x => x.id !== id));
+    renderDrawer();
+    showToast('Deleted');
+  }
+
+  function openDrawer() {
+    renderDrawer();
+    document.getElementById('overlay').classList.add('open');
+    document.getElementById('drawer').classList.add('open');
+  }
+
+  function closeDrawer() {
+    document.getElementById('overlay').classList.remove('open');
+    document.getElementById('drawer').classList.remove('open');
+  }
+
+  /* ── Toast ── */
+  let toastT;
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastT);
+    toastT = setTimeout(() => t.classList.remove('show'), 2400);
+  }
+
+  /* ── PWA install ── */
+  let deferredPrompt = null;
+  window.addEventListener('beforeinstallprompt', e => {
+    e.preventDefault();
+    deferredPrompt = e;
+    if (!localStorage.getItem('installDismissed')) {
+      document.getElementById('installBanner').classList.add('show');
+    }
+  });
+  function triggerInstall() {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then(() => {
+      deferredPrompt = null;
+      document.getElementById('installBanner').classList.remove('show');
+    });
+  }
+  function dismissInstall() {
+    localStorage.setItem('installDismissed', '1');
+    document.getElementById('installBanner').classList.remove('show');
+  }
+
+  /* ── Service worker ── */
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./sw.js').catch(() => {});
+  }
+
+  /* ── Modal keyboard ── */
+  document.getElementById('modalName').addEventListener('keydown', e => {
+    if (e.key === 'Enter') confirmSave();
+    if (e.key === 'Escape') closeSaveModal();
+  });
+  document.getElementById('saveModal').addEventListener('click', function(e) {
+    if (e.target === this) closeSaveModal();
+  });
+
+  /* ── Init ── */
+  document.getElementById('rate').value = savedRate();
+  ['rate','hours','materials','subcontractor','equipment','marginSlider'].forEach(id => {
+    document.getElementById(id).addEventListener('input', calc);
+  });
+
+  updateBadge();
+  calc();
+</script>
+</body>
+</html>
